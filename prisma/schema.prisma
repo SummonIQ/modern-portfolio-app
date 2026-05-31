@@ -1,0 +1,165 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── Better Auth ──────────────────────────────────────────────
+
+model User {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  emailVerified Boolean  @default(false)
+  name          String?
+  image         String?
+  role          String   @default("admin")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  accounts Account[]
+  sessions Session[]
+
+  @@map("user")
+}
+
+model Account {
+  id                    String    @id
+  userId                String
+  accountId             String
+  providerId            String
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  password              String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("account")
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  ipAddress String?
+  userAgent String?
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("session")
+}
+
+model Verification {
+  id         String    @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime?
+  updatedAt  DateTime?
+
+  @@map("verification")
+}
+
+// ─── Portfolio ────────────────────────────────────────────────
+
+model Project {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  summary     String
+  // PlateJS markdown content; rendered on the project detail page
+  content     String?
+  category    String
+  // Project completion / event date
+  date        DateTime
+  coverImage  String?
+  // Public link to the live project, repo, etc.
+  link        String?
+  // Optional list of additional images, each with a caption
+  gallery     Json?
+  // Tags / tech stack chips
+  tags        String[]
+  featured    Boolean  @default(false)
+  published   Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([published, sortOrder])
+  @@index([category])
+}
+
+model Skill {
+  id        String   @id @default(cuid())
+  name      String
+  category  String   @default("General")
+  // 0–100 mastery level for the bar/ring; ignore if you don't want to show
+  level     Int      @default(80)
+  icon      String?
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SocialLink {
+  id        String   @id @default(cuid())
+  platform  String
+  url       String
+  // lucide-react icon name, e.g. "github", "linkedin", "twitter"
+  icon      String?
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Singleton row (id = "site") holding all editable site copy.
+model SiteSettings {
+  id              String   @id @default("site")
+  // Hero
+  ownerName       String   @default("Your Name")
+  headline        String   @default("Designer & Developer")
+  tagline         String   @default("I craft modern, accessible web experiences.")
+  heroImage       String?
+  // About
+  aboutTitle      String   @default("About me")
+  // PlateJS markdown content
+  aboutBody       String?
+  // Plain-text fallback for SEO / meta description
+  aboutSummary    String   @default("")
+  resumeUrl       String?
+  // Skills section copy
+  skillsTitle     String   @default("Skills")
+  skillsSubtitle  String   @default("Tools and technologies I use day-to-day.")
+  // Projects section copy
+  projectsTitle   String   @default("Selected work")
+  projectsSubtitle String  @default("A few things I've built recently.")
+  // Contact
+  contactEmail    String   @default("hello@example.com")
+  contactPhone    String?
+  contactLocation String?
+  contactBlurb    String   @default("Have a project in mind? Let's talk.")
+  // SEO
+  siteTitle       String   @default("Portfolio")
+  siteDescription String   @default("A personal portfolio.")
+  siteUrl         String   @default("http://localhost:3030")
+  updatedAt       DateTime @updatedAt
+}
+
+model ContactMessage {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  subject   String?
+  message   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
