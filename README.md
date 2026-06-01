@@ -1,3 +1,18 @@
+<!-- SUMMONIQ-OSS-HEADER:START -->
+<div align="center">
+
+  <h1>Modern Portfolio App</h1>
+  <p>Responsive portfolio website with an admin panel for managing projects and content.</p>
+
+  <p>
+    <a href="https://github.com/SummonIQ/modern-portfolio-app"><img alt="Repository" src="https://img.shields.io/badge/github-SummonIQ%2Fmodern-portfolio-app-24292f?logo=github"></a>
+    <a href="https://unlicense.org/"><img alt="License: Unlicense" src="https://img.shields.io/badge/license-Unlicense-blue.svg"></a>
+  </p>
+
+</div>
+
+---
+<!-- SUMMONIQ-OSS-HEADER:END -->
 # Modern Portfolio
 
 A modern, responsive portfolio website with a built-in admin panel. Add, edit,
